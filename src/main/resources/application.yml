@@ -1,4 +1,9 @@
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_3PuBEQnif
   servlet:
     multipart:
       max_file-size: -1

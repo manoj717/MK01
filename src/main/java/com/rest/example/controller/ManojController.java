@@ -6,6 +6,7 @@ import com.rest.example.service.ManojService;
 import com.rest.example.service.ManojServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.owasp.encoder.Encode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,28 +14,33 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
-@Controller
-@RequestMapping("/file/v1")
+import static com.rest.example.util.Constants.PROCESS_TIME;
+
+@RestController
+@RequestMapping(value = "/file/v1", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 @Slf4j
 public class ManojController {
 
-    //USER: ManojUser,Manu@143, ManuGit@143
+    //USER: ManojUser,Manoj@143, ManuGit@143
 
-    @Autowired
-    private ManojServiceImpl manojService;
+    private final ManojService manojService;
 
     @PostMapping(value = "/employee/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
     produces = MediaType.APPLICATION_JSON_VALUE)
-    private ResponseEntity<APIResonseDTO> uploadData(@RequestPart("employeeDetails") EmployeeDetailsDTO employeeDetailsDTO,
+    private ResponseEntity<String> uploadData(@RequestPart("employeeDetails") EmployeeDetailsDTO employeeDetailsDTO,
                                                      @RequestPart("employeeFile") List<MultipartFile> multipartFileList,
                                                      @RequestHeader Map<String, String> headers){
         log.info("Request Started");
+        final Instant start = Instant.now();
         APIResonseDTO apiResonseDTO = manojService.uploadData(employeeDetailsDTO, multipartFileList);
         log.info("Request Ended");
-        return ResponseEntity.ok().body(apiResonseDTO);
+        log.info(PROCESS_TIME, Encode.forJava(String.valueOf(Duration.between(start, Instant.now()))));
+        return ResponseEntity.ok().body(apiResonseDTO.getResponseBody());
     }
 }

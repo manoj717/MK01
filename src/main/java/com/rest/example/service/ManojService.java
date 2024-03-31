@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface ManojService {
 
-    public APIResonseDTO uploadData(EmployeeDetailsDTO employeeDetailsDTO, List<MultipartFile> multipartFileList);
+    APIResonseDTO uploadData(EmployeeDetailsDTO employeeDetailsDTO, List<MultipartFile> multipartFileList);
 }
