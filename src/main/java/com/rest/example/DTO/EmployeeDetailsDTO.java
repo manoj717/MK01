@@ -1,7 +1,10 @@
 package com.rest.example.DTO;
 
+import lombok.Getter;
+
 import java.util.List;
 
+@Getter
 public class EmployeeDetailsDTO {
 
     private int empId;

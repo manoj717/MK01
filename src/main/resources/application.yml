@@ -8,3 +8,6 @@ spring:
     multipart:
       max_file-size: -1
       max-request-size: -1
+
+aws:
+  auth: ${AWS_AUTH}

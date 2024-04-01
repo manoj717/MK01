@@ -4,7 +4,7 @@ public class GlobalException extends RuntimeException{
 
     private ApplicationError applicationError;
 
-    private GlobalException(ApplicationError applicationError){
+    public GlobalException(ApplicationError applicationError){
         this.applicationError=applicationError;
     }
 }
