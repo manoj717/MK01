@@ -11,3 +11,6 @@ spring:
 
 aws:
   auth: ${AWS_AUTH}
+
+server:
+  port: 8084

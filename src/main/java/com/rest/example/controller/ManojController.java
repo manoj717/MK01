@@ -3,14 +3,11 @@ package com.rest.example.controller;
 import com.rest.example.DTO.APIResonseDTO;
 import com.rest.example.DTO.EmployeeDetailsDTO;
 import com.rest.example.service.ManojService;
-import com.rest.example.service.ManojServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.owasp.encoder.Encode;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 

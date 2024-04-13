@@ -7,6 +7,7 @@ import com.rest.example.DTO.EmployeeDetailsDTO;
 import com.rest.example.config.EnvironmentVariables;
 import com.rest.example.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,6 @@ import software.amazon.awssdk.http.*;
 import software.amazon.awssdk.http.apache.ApacheHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.utils.IoUtils;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
@@ -31,6 +31,7 @@ import static com.rest.example.exception.ErrorDetails.SERVICE_UNAVAILABLE;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ManojServiceImpl implements ManojService {
 
     private final EnvironmentVariables environmentVariables;
@@ -38,11 +39,11 @@ public class ManojServiceImpl implements ManojService {
     private final Gson gson;
     @Override
     public APIResonseDTO uploadData(EmployeeDetailsDTO employeeDetailsDTO, List<MultipartFile> multipartFileList) {
-
+        log.info("Building Department Request");
         BancsRequestDto requestDTO = buildDepartmentRequestDTO(employeeDetailsDTO);
-        callExternalAPI(requestDTO);
-
-        return APIResonseDTO.builder().statusCode(200).responseBody("Success").build();
+        log.info("Built Department Request");
+        APIResonseDTO apiResponse = callExternalAPI(requestDTO);
+        return APIResonseDTO.builder().statusCode(200).responseBody(apiResponse.getResponseBody()).build();
     }
 
     private BancsRequestDto buildDepartmentRequestDTO(EmployeeDetailsDTO employeeDetails){
@@ -56,7 +57,7 @@ public class ManojServiceImpl implements ManojService {
     private APIResonseDTO callExternalAPI(final BancsRequestDto bancsRequest){
 
         SdkHttpFullRequest sdkHttpFullRequest = environmentVariables.isAwsAuth()?
-                signRequest(buildBancsUnsignedRequest(bancsRequest)) : buildBancsSignedRequest(bancsRequest);
+                signRequest(buildBancsSignedRequest(bancsRequest)) : buildBancsUnsignedRequest(bancsRequest);
         return getHttpResponse(sdkHttpFullRequest);
     }
 
@@ -67,7 +68,9 @@ public class ManojServiceImpl implements ManojService {
         HttpExecuteResponse httpResponse;
         String responseBody = null;
         try{
+            log.info("Calling External API ");
             httpResponse = getHttpExecuteResponse(executeRequest, httpClient);
+            log.info("Calling External API is Completed");
             Optional<AbortableInputStream> httpResponseBody = httpResponse.responseBody();
             if(httpResponseBody.isPresent()){
                 responseBody = IoUtils.toUtf8String(httpResponseBody.get());
@@ -77,7 +80,8 @@ public class ManojServiceImpl implements ManojService {
         }
         return APIResonseDTO.builder()
                 .statusCode(httpResponse.httpResponse().statusCode())
-                .responseBody(responseBody).build();
+                .responseBody(responseBody)
+                .build();
     }
 
     private HttpExecuteResponse getHttpExecuteResponse(HttpExecuteRequest executeRequest, SdkHttpClient httpClient) throws IOException {
@@ -85,6 +89,7 @@ public class ManojServiceImpl implements ManojService {
     }
 
     private SdkHttpFullRequest signRequest(final SdkHttpFullRequest sdkHttpFullRequest){
+        log.info("Building Signed Request");
         Aws4Signer signer = Aws4Signer.create();
         Aws4SignerParams signerParams;
         try(DefaultCredentialsProvider defaultCredentialsProvider = DefaultCredentialsProvider.create()){
@@ -101,7 +106,7 @@ public class ManojServiceImpl implements ManojService {
         try {
             return SdkHttpFullRequest.builder()
                     .method(SdkHttpMethod.POST)
-                    .uri(new URI(""))
+                    .uri(new URI("http://localhost:8085/mock/response"))
                     .putHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .contentStreamProvider(createContentStream(gson.toJson(bancsRequest).getBytes()))
                     .build();
@@ -111,10 +116,11 @@ public class ManojServiceImpl implements ManojService {
     }
 
     private SdkHttpFullRequest buildBancsUnsignedRequest(BancsRequestDto bancsRequest){
+        log.info("Building Unsigned Request");
         try {
             return SdkHttpFullRequest.builder()
                     .method(SdkHttpMethod.POST)
-                    .uri(new URI(""))
+                    .uri(new URI("http://localhost:8085/mock/response"))
                     .putHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .contentStreamProvider(createContentStream(gson.toJson(bancsRequest).getBytes()))
                 .build();

@@ -9,7 +9,7 @@ public class EmployeeDetailsDTO {
 
     private int empId;
     private String name;
-    private int mobNumber;
+    private String mobNumber;
 
     private double salary;
 
