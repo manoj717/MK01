@@ -39,6 +39,7 @@ public class ManojServiceImpl implements ManojService {
     private final Gson gson;
     @Override
     public APIResonseDTO uploadData(EmployeeDetailsDTO employeeDetailsDTO, List<MultipartFile> multipartFileList) {
+
         log.info("Building Department Request");
         BancsRequestDto requestDTO = buildDepartmentRequestDTO(employeeDetailsDTO);
         log.info("Built Department Request");
@@ -47,11 +48,11 @@ public class ManojServiceImpl implements ManojService {
     }
 
     private BancsRequestDto buildDepartmentRequestDTO(EmployeeDetailsDTO employeeDetails){
+
         return BancsRequestDto.builder().empId(employeeDetails.getEmpId())
                 .name(employeeDetails.getName())
                 .mobNumber(employeeDetails.getMobNumber())
                 .build();
-
     }
 
     private APIResonseDTO callExternalAPI(final BancsRequestDto bancsRequest){
