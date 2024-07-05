@@ -2,6 +2,7 @@ package com.rest.example.controller;
 
 import com.rest.example.DTO.APIResonseDTO;
 import com.rest.example.DTO.EmployeeDetailsDTO;
+import com.rest.example.service.ImageUploadService;
 import com.rest.example.service.ManojService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,8 @@ public class ManojController {
 
     private final ManojService manojService;
 
+    private final ImageUploadService imageUploadService;
+
     @PostMapping(value = "/employee/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
     produces = MediaType.APPLICATION_JSON_VALUE)
     private ResponseEntity<String> uploadData(@RequestPart("employeeDetails") EmployeeDetailsDTO employeeDetailsDTO,
@@ -36,6 +39,18 @@ public class ManojController {
         log.info("Request Started");
         final Instant start = Instant.now();
         APIResonseDTO apiResonseDTO = manojService.uploadData(employeeDetailsDTO, multipartFileList);
+        log.info("Request Ended");
+        log.info(PROCESS_TIME, Encode.forJava(String.valueOf(Duration.between(start, Instant.now()))));
+        return ResponseEntity.ok().body(apiResonseDTO.getResponseBody());
+    }
+
+    @PostMapping(value = "/image/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    private ResponseEntity<String> uploadImage(@RequestPart("fileUpload") MultipartFile multipartFile,
+                                              @RequestHeader Map<String, String> headers){
+        log.info("Request Started");
+        final Instant start = Instant.now();
+        APIResonseDTO apiResonseDTO = imageUploadService.uploadImage(multipartFile);
         log.info("Request Ended");
         log.info(PROCESS_TIME, Encode.forJava(String.valueOf(Duration.between(start, Instant.now()))));
         return ResponseEntity.ok().body(apiResonseDTO.getResponseBody());
